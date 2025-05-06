@@ -63,6 +63,19 @@ const updateUser = async (req, res) => {
 
   try {
     const data = await req.body;
+    // Check if email is being updated
+    if (data.email) {
+      const existingUser = await User.findOne({ email: data.email });
+
+      // If another user has this email and it's not the current user
+      if (existingUser && existingUser._id.toString() !== uid) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email is already in use by another account.',
+        });
+      }
+    }
+
     const profile = await User.findByIdAndUpdate(
       uid,
       { ...data },
@@ -82,6 +95,7 @@ const updateUser = async (req, res) => {
     return res.status(200).json({
       success: true,
       data: profile,
+      message: "Details updated successfully."
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
@@ -142,13 +156,9 @@ const changePassword = async (req, res) => {
           .json({ success: false, message: 'New Password Mismatch' });
       }
       if (password === newPassword) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: 'Please Enter A New Password ',
-          },
-          { status: 400 }
-        );
+        return res
+          .status(400)
+          .json({ success: false, message: 'Please enter a new password' });
       }
       // Hash the new password before updating
       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -171,11 +181,11 @@ const changePassword = async (req, res) => {
 
       return res
         .status(201)
-        .json({ success: true, message: 'Password Changed' });
+        .json({ success: true, message: 'Password changed Successfully' });
     } else {
       return res
         .status(400)
-        .json({ success: false, message: 'Old Password Incorrect' });
+        .json({ success: false, message: 'Old password is incorrect' });
     }
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
