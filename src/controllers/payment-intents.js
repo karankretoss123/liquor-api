@@ -1,4 +1,5 @@
 const Stripe = require("stripe");
+require("dotenv").config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const currency = process.env.CURRENCY;
 
@@ -14,6 +15,8 @@ const payment_intents = async (req, res) => {
 
 		return res.status(200).json({ client_secret: paymentIntent.client_secret });
 	} catch (error) {
+		console.log("error  = ", error);
+
 		return res.status(500).json({ success: false, message: error.message });
 	}
 };
