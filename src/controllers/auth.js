@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '7d',
+        expiresIn: '365d',
       }
     );
     // Path to the HTML file
@@ -125,7 +125,7 @@ const loginUser = async (req, res) => {
       },
       process.env.JWT_SECRET,
       {
-        expiresIn: '7d',
+        expiresIn: '365d',
       }
     );
 
@@ -205,7 +205,7 @@ const forgetPassword = async (req, res) => {
     }
 
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '7d',
+      expiresIn: '365d',
     });
     // Constructing the link with the token
     const resetPasswordLink = `${request.origin}/auth/reset-password/${token}`;
