@@ -48,7 +48,14 @@ const createReview = async (req, res) => {
 	try {
 		const user = await getUser(req, res);
 		const uid = user._id.toString();
-		const { pid, rating, review: reviewText, images } = req.body;
+		const { pid, rating, review: reviewText, images = [] } = req.body;
+
+		if (!pid || !rating || !reviewText) {
+			return res.status(400).json({
+				success: false,
+				message: "Please provide required details. (pid, rating, review)"
+			})
+		}
 
 		const orders = await Orders.find({
 			"user.email": user.email,

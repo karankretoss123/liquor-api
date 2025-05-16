@@ -105,6 +105,9 @@ const updateUser = async (req, res) => {
 const getInvoice = async (req, res) => {
   try {
     const user = await getUser(req, res);
+    
+    console.log("user= ",req.user);
+    
     const { limit = 10, page = 1 } = req.query;
 
     const skip = parseInt(limit) * (parseInt(page) - 1) || 0;

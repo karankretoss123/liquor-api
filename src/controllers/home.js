@@ -2,6 +2,7 @@
 const BrandModel = require('../models/Brand');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const User = require('../models/User');
 
 const getCategories = async (req, res) => {
   try {
@@ -23,6 +24,7 @@ const getCategories = async (req, res) => {
 
 const getTopRatedProducts = async (req, res) => {
   try {
+    const query = req.query;
     const bestSellingProduct = await Product.aggregate([
       {
         $lookup: {
@@ -64,7 +66,21 @@ const getTopRatedProducts = async (req, res) => {
         },
       },
     ]);
-    res.status(201).json({ success: true, data: bestSellingProduct });
+
+    // ✅ Add isWishlisted field based on user_id
+    let wishlist = [];
+    if (query.user_id) {
+      const user = await User.findById(query.user_id).select('wishlist');
+      if (user && user.wishlist && Array.isArray(user.wishlist)) {
+        wishlist = user.wishlist.map(id => id.toString());
+      }
+    }
+
+    const enrichedProducts = bestSellingProduct.map(product => ({
+      ...product,
+      isWishlisted: wishlist.includes(product._id.toString()),
+    }));
+    res.status(201).json({ success: true, data: enrichedProducts });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -95,6 +111,7 @@ const getBrands = async (req, res) => {
 
 const getBestSellerProducts = async (req, res) => {
   try {
+    const query = req.query;
     const bestSellingProduct = await Product.aggregate([
       {
         $lookup: {
@@ -134,13 +151,28 @@ const getBestSellerProducts = async (req, res) => {
         },
       },
     ]);
-    return res.status(200).json({ success: true, data: bestSellingProduct });
+
+    // ✅ Add isWishlisted field based on user_id
+    let wishlist = [];
+    if (query.user_id) {
+      const user = await User.findById(query.user_id).select('wishlist');
+      if (user && user.wishlist && Array.isArray(user.wishlist)) {
+        wishlist = user.wishlist.map(id => id.toString());
+      }
+    }
+
+    const enrichedProducts = bestSellingProduct.map(product => ({
+      ...product,
+      isWishlisted: wishlist.includes(product._id.toString()),
+    }));
+    return res.status(200).json({ success: true, data: enrichedProducts });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }
 };
 const getFeaturedProducts = async (req, res) => {
   try {
+    const query = req.query;
     const bestSellingProduct = await Product.aggregate([
       {
         $lookup: {
@@ -181,7 +213,21 @@ const getFeaturedProducts = async (req, res) => {
         },
       },
     ]);
-    return res.status(200).json({ success: true, data: bestSellingProduct });
+
+    // ✅ Add isWishlisted field based on user_id
+    let wishlist = [];
+    if (query.user_id) {
+      const user = await User.findById(query.user_id).select('wishlist');
+      if (user && user.wishlist && Array.isArray(user.wishlist)) {
+        wishlist = user.wishlist.map(id => id.toString());
+      }
+    }
+
+    const enrichedProducts = bestSellingProduct.map(product => ({
+      ...product,
+      isWishlisted: wishlist.includes(product._id.toString()),
+    }));
+    return res.status(200).json({ success: true, data: enrichedProducts });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
   }

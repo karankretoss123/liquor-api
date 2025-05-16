@@ -28,12 +28,12 @@ const reviewSchema = new mongoose.Schema(
       {
         url: {
           type: String,
-          required: [true, 'image-id-required-error'],
+          // required: [true, 'image-id-required-error'],
         },
 
         blurDataURL: {
           type: String,
-          required: [true, 'image-blur-data-url-required-error'],
+          // required: [true, 'image-blur-data-url-required-error'],
         },
       },
     ],

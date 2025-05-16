@@ -61,6 +61,13 @@ const createWishlist = async (req, res) => {
     const { pid } = req.body;
     const isAlready = wishlist.filter((id) => id.toString() === pid);
 
+    if(!pid){
+      return res.status(400).json({
+        success: false,
+        message: "Please provide required details. (pid)"
+      })
+    }
+
     if (!Boolean(isAlready.length)) {
       await Users.findByIdAndUpdate(
         uid,

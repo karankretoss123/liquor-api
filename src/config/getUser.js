@@ -6,7 +6,8 @@ exports.getUser = async (req, res) => {
       .status(401)
       .json({ success: false, message: 'You Must Be Logged In.' });
   }
-
+  console.log("1111111111111111111111111111111111111111");
+  
   try {
     const user = await Users.findById(req.user._id);
     if (!user) {

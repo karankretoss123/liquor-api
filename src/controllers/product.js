@@ -8,6 +8,7 @@ const _ = require('lodash');
 const { multiFilesDelete } = require('../config/uploader');
 const blurDataUrl = require('../config/getBlurDataURL');
 const { getAdmin } = require('../config/getUser');
+const User = require('../models/User');
 const getProducts = async (req, res) => {
   try {
     const query = req.query; // Extract query params from request
@@ -25,6 +26,10 @@ const getProducts = async (req, res) => {
     delete newQuery.category;
     delete newQuery.subCategory;
     delete newQuery.gender;
+    delete newQuery.user_id;
+
+    console.log("query.user_id= ", query.user_id);
+
 
     for (const [key, value] of Object.entries(newQuery)) {
       newQuery = { ...newQuery, [key]: value.split('_') };
@@ -139,8 +144,8 @@ const getProducts = async (req, res) => {
             }) ||
             (query.name && { name: Number(query.name) }) ||
             (query.top && { averageRating: Number(query.top) }) || {
-              averageRating: -1,
-            }),
+            averageRating: -1,
+          }),
         },
       },
       {
@@ -151,9 +156,23 @@ const getProducts = async (req, res) => {
       },
     ]);
 
+    // ✅ Add isWishlisted field based on user_id
+    let wishlist = [];
+    if (query.user_id) {
+      const user = await User.findById(query.user_id).select('wishlist');
+      if (user && user.wishlist && Array.isArray(user.wishlist)) {
+        wishlist = user.wishlist.map(id => id.toString());
+      }
+    }
+
+    const enrichedProducts = products.map(product => ({
+      ...product,
+      isWishlisted: wishlist.includes(product._id.toString()),
+    }));
+
     res.status(201).json({
       success: true,
-      data: products,
+      data: enrichedProducts,
       total: totalProducts,
       count: Math.ceil(totalProducts / skip),
     });

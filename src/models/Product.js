@@ -74,12 +74,6 @@ const productSchema = new mongoose.Schema(
         ref: 'Review',
       },
     ],
-
-    // shop: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: 'Shop',
-    //   required: true,
-    // },
     images: [
       {
         url: {
