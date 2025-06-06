@@ -7,6 +7,11 @@ const getWishlist = async (req, res) => {
     const user = await getUser(req, res);
     //  Fetch wishlist and related products
     const wishlist = user.wishlist;
+
+    const { limit = 100, page = 1 } = req.query;
+
+    const skip = parseInt(limit) * (parseInt(page) - 1) || 0;
+    const totalWishlist = wishlist.length;
     const products = await Products.aggregate([
       {
         $match: {
@@ -42,11 +47,14 @@ const getWishlist = async (req, res) => {
           createdAt: 1,
         },
       },
+      { $skip: skip },
+      { $limit: parseInt(limit) },
     ]);
 
     return res.status(200).json({
       success: true,
       data: products,
+      count: Math.ceil(totalWishlist / parseInt(limit)),
     });
   } catch (error) {
     return res.status(400).json({ success: false, message: error.message });
@@ -61,7 +69,7 @@ const createWishlist = async (req, res) => {
     const { pid } = req.body;
     const isAlready = wishlist.filter((id) => id.toString() === pid);
 
-    if(!pid){
+    if (!pid) {
       return res.status(400).json({
         success: false,
         message: "Please provide required details. (pid)"
