@@ -6,5 +6,6 @@ router.get('/home/products/top', homeController.getTopRatedProducts);
 router.get('/home/products/best-selling', homeController.getBestSellerProducts);
 router.get('/home/products/featured', homeController.getFeaturedProducts);
 router.get('/home/brands', homeController.getBrands);
+router.get('/home/sliders', homeController.getHomeSliders);
 
 module.exports = router;

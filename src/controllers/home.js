@@ -2,6 +2,7 @@
 const BrandModel = require('../models/Brand');
 const Category = require('../models/Category');
 const Product = require('../models/Product');
+const SliderSetting = require('../models/SliderSetting');
 const User = require('../models/User');
 
 const getCategories = async (req, res) => {
@@ -233,10 +234,32 @@ const getFeaturedProducts = async (req, res) => {
   }
 };
 
+const getHomeSliders = async (req, res) => {
+  try {
+    const sliders = await SliderSetting.find()
+      .populate('category', 'slug')
+      .populate('subCategory', 'slug')
+      .sort({ createdAt: -1 });
+
+    const transformed = sliders.map((slider) => ({
+      image: slider.image?.url || '',
+      redirect_url: `/products/${slider.category?.slug || ''}/${slider.subCategory?.slug || ''}`
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: transformed
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
 module.exports = {
   getCategories,
   getTopRatedProducts,
   getBrands,
   getBestSellerProducts,
   getFeaturedProducts,
+  getHomeSliders
 };
